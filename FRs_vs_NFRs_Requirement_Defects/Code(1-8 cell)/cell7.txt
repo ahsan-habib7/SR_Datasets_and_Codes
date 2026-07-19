@@ -1,0 +1,20 @@
+# CELL 7 - Test Multiple Requirements
+
+
+
+
+test_requirements = [
+    "The system shall allow users to login with email and password.",
+    "The application must respond within 200 milliseconds.",
+    "The system shall be fast.",
+    "The system shall maintain 99.9% uptime.",
+    "Users can search.",
+    "The system shall store data indefinitely and delete it after 30 days.",
+    "All passwords shall be hashed using bcrypt with cost factor 12.",
+    "The application shall comply with GDPR data protection regulations.",
+    "The system shall be secure.",
+    "Users must be able to export data in CSV format.",
+]
+
+for req in test_requirements:
+    classify_requirement(req)

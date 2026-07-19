@@ -1,0 +1,63 @@
+# CELL 6 - Classify Any Requirement
+
+
+def classify_requirement(text):
+    text = text.strip()
+
+    # -------- TASK 1: TYPE --------
+    type_votes = [pipe.predict([text])[0] for pipe in ALL_MODELS['type'].values()]
+    pred_type  = Counter(type_votes).most_common(1)[0][0]
+    type_conf  = Counter(type_votes)[pred_type] / len(type_votes)
+
+    # -------- TASK 2: DEFECT (ML ONLY) --------
+    def_votes = [int(pipe.predict([text])[0]) for pipe in ALL_MODELS['defect'].values()]
+    ml_defect = Counter(def_votes).most_common(1)[0][0]
+    has_defect = bool(ml_defect)
+
+    # -------- TASK 3 & 4: PURE ML --------
+    if has_defect:
+        dt_votes = [pipe.predict([text])[0] for pipe in ALL_MODELS['dtype'].values()]
+        defect_type = Counter(dt_votes).most_common(1)[0][0]
+
+        sv_votes = [pipe.predict([text])[0] for pipe in ALL_MODELS['severity'].values()]
+        severity = Counter(sv_votes).most_common(1)[0][0]
+
+        note = 'Predicted using ML models.'
+    else:
+        defect_type = 'None'
+        severity    = 'N/A'
+        note        = 'No defect detected.'
+
+    # -------- TYPE EXPLANATION --------
+    tl = text.lower()
+
+    fr_kw  = [w for w in ['shall','must','allow','login','create','delete','update',
+                           'search','upload','generate','send','notify','track','manage']
+               if w in tl][:3]
+
+    nfr_kw = [w for w in ['performance','availability','security','encryption','gdpr',
+                           '99.9','milliseconds','compliance','backup','uptime','latency']
+               if w in tl][:3]
+
+    if pred_type == 'FR':
+        type_note = 'Functional - describes system behaviour.'
+    else:
+        type_note = 'Non-Functional - describes quality attribute.'
+
+    # -------- OUTPUT --------
+    print('\n' + '-' * 60)
+    print('REQUIREMENT:')
+    print(f'"{text}"')
+    print('-' * 60)
+    print('Type        :', pred_type, f'({int(type_conf*100)}%)')
+    print('Has Defect  :', 'Yes' if has_defect else 'No')
+    print('Defect Type :', defect_type)
+    print('Severity    :', severity)
+    print('Note        :', note)
+    print('Class       :', type_note)
+    print('-' * 60)
+
+
+# TEST
+my_requirement = "The system shall be fast."
+classify_requirement(my_requirement)
